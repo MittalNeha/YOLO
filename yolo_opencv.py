@@ -61,7 +61,7 @@ if (args.image):
 else:
     cap = cv2.VideoCapture(args.video)
     fps_in = cap.get(cv2.CAP_PROP_FPS)
-    fps_out = int(fps_in*2)
+    fps_out = int(fps_in/2)
     vid_writer = cv2.VideoWriter("detected.mp4", cv2.VideoWriter_fourcc(*'MP4V'), fps_out,
                                  (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
 
@@ -92,7 +92,7 @@ def get_player_info(rect, image, num):
 
     team1_range = np.array([[0,0,50], [50,60,255]])
     team2_range = np.array([[60, 0, 0],[255, 100, 70]])
-    referee_range = np.array([[0,0,0], [50,50,50]])
+    referee_range = np.array([[0,0,0], [30,30,30]])
 
     team1_mask = cv2.inRange(player, team1_range[0], team1_range[1])
     team2_mask = cv2.inRange(player, team2_range[0], team2_range[1])
@@ -101,11 +101,11 @@ def get_player_info(rect, image, num):
 
     val_pert = [cv2.countNonZero(mask) for mask in all_mask]
     val_pert = [val*100/(player.shape[0] * player.shape[1]) for val in val_pert]
-    if val_pert[2] > 10:
+    if val_pert[2] > 15:
         cv2.imwrite("referee_{}.png".format(num), player)
         cv2.imwrite("referee_mask_{}.png".format(num), referee_mask)
 
-    found = [team_str[i] for i,val in enumerate(val_pert) if val>10]
+    found = [team_str[i] for i,val in enumerate(val_pert) if val>15]
 
     print(val_pert)
     print("Player info {}".format(found))
@@ -126,7 +126,7 @@ while (cv2.waitKey(1) < 0):
             cap.release()
             break
     frameNum = frameNum + 1
-    if(frameNum < 13*30):
+    if(frameNum < 11*30):
         continue
     #if frameNum%3!=0:
     #    continue
@@ -185,7 +185,7 @@ while (cv2.waitKey(1) < 0):
     # label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
     # print(label)
 
-    cv2.imshow("object detection", image)
+    #cv2.imshow("object detection", image)
     if (args.image):
         cv2.imwrite("object-detection.jpg", image)
     else:
